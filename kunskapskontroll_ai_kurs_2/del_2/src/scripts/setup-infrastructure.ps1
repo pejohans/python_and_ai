@@ -59,18 +59,18 @@ $variableGroups = @(
         Name = "dev-vars"
         Variables = @{
             "location" = $Location
-            "resourceGroup" = "rg-kunskapskontroll-ai-kurs-2-dev"
+            "resourceGroupName" = "rg-kunskapskontroll-ai-kurs-2-dev"
             "functionAppName" = "func-nightly-pipeline-dev"
-            "azureServiceConnection" = "Azure-Subscription-dev"
+            "azureServiceConnection" = "Azure-Subscription-dev-ai"
         }
     },
     @{
         Name = "test-vars"
         Variables = @{
             "location" = $Location
-            "resourceGroup" = "rg-kunskapskontroll-ai-kurs-2-test"
+            "resourceGroupName" = "rg-kunskapskontroll-ai-kurs-2-test"
             "functionAppName" = "func-nightly-pipeline-test"
-            "azureServiceConnection" = "Azure-Subscription-test"
+            "azureServiceConnection" = "Azure-Subscription-test-ai"
 
         }
     },
@@ -78,9 +78,9 @@ $variableGroups = @(
         Name = "prod-vars"
         Variables = @{
             "location" = $Location
-            "resourceGroup" = "rg-kunskapskontroll-ai-kurs-2-prod"
+            "resourceGroupName" = "rg-kunskapskontroll-ai-kurs-2-prod"
             "functionAppName" = "func-nightly-pipeline-prod"
-            "azureServiceConnection" = "Azure-Subscription-prod"
+            "azureServiceConnection" = "Azure-Subscription-prod-ai"
         }
     }
 )
