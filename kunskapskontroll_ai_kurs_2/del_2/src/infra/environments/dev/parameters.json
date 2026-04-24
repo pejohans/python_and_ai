@@ -1,0 +1,27 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "namePrefix": {
+      "value": "stockml"
+    },
+    "acrName": {
+      "value": "stockml-acr-dev"
+    },
+    "functionAppName": {
+      "value": "func-nightly-pipeline-dev"
+    },
+    "storageAccountName": {
+      "value": "stockml-storage-dev"
+    },
+    "blobContainerName": {
+      "value": "stockml-container-dev"
+    },
+    "timerSchedule": {
+      "value": "0 0 1 * * *"
+    },
+    "omx30Symbols": {
+      "value": "ERIC-B,VOLV-B,ATCO-A,ATCO-B,SAND,SEB-A,SWED-A,SHB-A,NDA-SE,TELIA"
+    }
+  }
+}
