@@ -2,17 +2,26 @@
   "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
   "contentVersion": "1.0.0.0",
   "parameters": {
-    "location": {
-      "value": "Sweden Central"
+    "namePrefix": {
+      "value": "stockml"
     },
-    "environment": {
-      "value": "test"
+    "acrName": {
+      "value": "stockml-acr-test"
     },
-    "serviceBusSku": {
-      "value": "Standard"
+    "functionAppName": {
+      "value": "func-nightly-pipeline-test"
     },
-    "functionAppSku": {
-      "value": "B1"
+    "storageAccountName": {
+      "value": "stockml-storage-test"
+    },
+    "blobContainerName": {
+      "value": "stockml-container-test"
+    },
+    "timerSchedule": {
+      "value": "0 0 1 * * *"
+    },
+    "omx30Symbols": {
+      "value": "ERIC-B,VOLV-B,ATCO-A,ATCO-B,SAND,SEB-A,SWED-A,SHB-A,NDA-SE,TELIA"
     }
   }
 }
