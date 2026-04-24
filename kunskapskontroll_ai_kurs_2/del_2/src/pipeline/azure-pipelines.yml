@@ -50,7 +50,7 @@ stages:
           az deployment group create \
             --name $DEPLOYMENT_NAME \
             --resource-group $(resourceGroupName) \
-            --template-file infra/main.bicep \
+            --template-file ../infra/main.bicep \
             --parameters infra/environments/${{ parameters.targetEnvironment }}/parameters.json
 
           OUT=$(az deployment group show -g $(resourceGroupName) -n $DEPLOYMENT_NAME --query properties.outputs -o json)
