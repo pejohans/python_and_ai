@@ -24,7 +24,7 @@ az pipelines create `
     --repository $RepositoryUrl `
     --repository-type github `
     --branch main `
-    --yml-path azure-pipelines.yml
+    --yml-path kunskapskontroll_ai_kurs_2/del_2/src/pipeline/azure-pipelines.yml
 
 Write-Host "✅ Pipeline created successfully!"
 Write-Host ""
@@ -32,4 +32,4 @@ Write-Host "Pipeline details:"
 Write-Host "- Name: $ProjectName-CICD"
 Write-Host "- Repository: $RepositoryUrl"
 Write-Host "- Branch: main"
-Write-Host "- YAML: azure-pipelines.yml"
+Write-Host "- YAML: kunskapskontroll_ai_kurs_2/del_2/src/pipeline/azure-pipelines.yml"
