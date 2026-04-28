@@ -143,7 +143,7 @@ resource api 'Microsoft.App/containerApps@2023-05-01' = {
             { name: 'OMX30_SYMBOLS', value: omx30Symbols }
           ]
           resources: {
-            cpu: 0.5
+            cpu: any('0.5')
             memory: '1Gi'
           }
         }
