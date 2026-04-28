@@ -152,7 +152,8 @@ foreach ($sc in $serviceConnections) {
         # Create service principal
         $spName = "AzureDevOps-SP-$sc"
         Write-Host "  Creating service principal: $spName"
-        $sp = az ad sp create-for-rbac --name $spName --role contributor --scopes "/subscriptions/$AzureSubscriptionId" --query "{appId:appId,password:password}" | ConvertFrom-Json
+        # NOTE: I have put owner as role for simplicity, but in production you should use least privilege principle and assign specific roles to the service principal
+        $sp = az ad sp create-for-rbac --name $spName --role owner --scopes "/subscriptions/$AzureSubscriptionId" --query "{appId:appId,password:password}" | ConvertFrom-Json
         
         if (-not $sp.appId) {
             throw "Failed to create service principal - appId is empty"
