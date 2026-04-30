@@ -101,13 +101,25 @@ resource acaEnv 'Microsoft.App/managedEnvironments@2023-05-01' = {
   }
 }
 
+
+resource apiIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2023-01-31' = {
+  name: '${namePrefix}-api-identity'
+  location: location
+}
+
+
 // Container App (FastAPI)
 resource api 'Microsoft.App/containerApps@2023-05-01' = {
   name: apiAppName
-  location: location
+  location: location  
+
   identity: {
-    type: 'SystemAssigned'
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${apiIdentity.id}': {}
+    }
   }
+
   properties: {
     managedEnvironmentId: acaEnv.id
     configuration: {
@@ -152,14 +164,15 @@ resource api 'Microsoft.App/containerApps@2023-05-01' = {
 }
 
 resource acrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(acr.id, api.name, 'AcrPull')
+  name: guid(acr.id, apiIdentity.id, 'AcrPull')
   scope: acr
   properties: {
     roleDefinitionId: subscriptionResourceId(
       'Microsoft.Authorization/roleDefinitions',
       '7f951dda-4ed3-4680-a7ca-43fe172d538d' // AcrPull
     )
-    principalId: api.identity.principalId
+    principalId: apiIdentity.properties.principalId
+    principalType: 'ServicePrincipal'
   }
 }
 
