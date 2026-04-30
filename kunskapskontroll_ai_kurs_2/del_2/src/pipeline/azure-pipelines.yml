@@ -81,7 +81,7 @@ stages:
             --name $DEPLOYMENT_NAME \
             --resource-group $(resourceGroupName) \
             --template-file kunskapskontroll_ai_kurs_2/del_2/src/infra/main.bicep \
-            --parameters kunskapskontroll_ai_kurs_2/del_2/src/infra/environments/${{ parameters.targetEnvironment }}/parameters.json
+            --parameters kunskapskontroll_ai_kurs_2/del_2/src/infra/environments/${{ parameters.targetEnvironment }}/parameters.json imageTag=${{ parameters.targetEnvironment }}
 
           OUT=$(az deployment group show -g $(resourceGroupName) -n $DEPLOYMENT_NAME --query properties.outputs -o json)
           echo "$OUT"

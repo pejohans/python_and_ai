@@ -31,6 +31,9 @@ param omx30Symbols string = 'ERIC-B,VOLV-B,ATCO-A,ATCO-B,SAND,SEB-A,SWED-A,SHB-A
 @description('Timer schedule NCRONTAB 6-field format. Default 01:00 UTC daily')
 param timerSchedule string = '0 0 1 * * *'
 
+@description('Image tag to deploy (passed from pipeline)')
+param imageTag string = 'dev'
+
 // Log Analytics
 resource logAnalytics 'Microsoft.OperationalInsights/workspaces@2022-10-01' = {
   name: '${namePrefix}-logs'
@@ -120,25 +123,12 @@ resource api 'Microsoft.App/containerApps@2023-05-01' = {
           }
         ]
       }
-      registries: [
-        {
-          server: acr.properties.loginServer
-          username: acr.listCredentials().username
-          passwordSecretRef: 'acr-pwd'
-        }
-      ]
-      secrets: [
-        {
-          name: 'acr-pwd'
-          value: acr.listCredentials().passwords[0].value
-        }
-      ]
     }
     template: {
       containers: [
         {
           name: 'api'
-          image: '${acr.properties.loginServer}/${namePrefix}-api:bootstrap'
+          image: '${acr.properties.loginServer}/${namePrefix}-api:${imageTag}'
           env: [
             { name: 'STORAGE_ACCOUNT_NAME', value: storageAccountName }
             { name: 'BLOB_CONTAINER_NAME', value: blobContainerName }
@@ -158,6 +148,18 @@ resource api 'Microsoft.App/containerApps@2023-05-01' = {
         maxReplicas: 2
       }
     }
+  }
+}
+
+resource acrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
+  name: guid(acr.id, api.name, 'AcrPull')
+  scope: acr
+  properties: {
+    roleDefinitionId: subscriptionResourceId(
+      'Microsoft.Authorization/roleDefinitions',
+      '7f951dda-4ed3-4680-a7ca-43fe172d538d' // AcrPull
+    )
+    principalId: api.identity.principalId
   }
 }
 
