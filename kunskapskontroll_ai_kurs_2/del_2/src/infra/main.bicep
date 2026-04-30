@@ -237,10 +237,10 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleDefinitions@202
 }
 
 resource apiBlobReaderAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
-  name: guid(resourceGroup().id, api.id, storageBlobDataReader.id)
+  name: guid(stg.id, apiIdentity.id, storageBlobDataReader.id)
   scope: stg
   properties: {
-    principalId: api.identity.principalId
+    principalId: apiIdentity.properties.principalId
     roleDefinitionId: storageBlobDataReader.id
     principalType: 'ServicePrincipal'
   }
