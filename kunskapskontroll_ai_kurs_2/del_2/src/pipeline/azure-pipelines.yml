@@ -51,7 +51,7 @@ stages:
           # -----------------------------
           # Variables
           # -----------------------------
-          IMAGE_NAME="${namePrefix}-api"
+          IMAGE_NAME="$(namePrefix)-api"
           IMAGE_FULL="$(acrName).azurecr.io/$IMAGE_NAME"
 
           echo "Using image: $IMAGE_FULL"
