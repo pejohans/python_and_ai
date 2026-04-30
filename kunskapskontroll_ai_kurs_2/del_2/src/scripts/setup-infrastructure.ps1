@@ -62,6 +62,7 @@ $variableGroups = @(
             "resourceGroupName" = "rg-kunskapskontroll-ai-kurs-2-dev"
             "functionAppName" = "func-nightly-pipeline-dev"
             "azureServiceConnection" = "Azure-Subscription-dev-ai"
+            "acrName" = "stockmlacrdev"
         }
     },
     @{
@@ -71,7 +72,7 @@ $variableGroups = @(
             "resourceGroupName" = "rg-kunskapskontroll-ai-kurs-2-test"
             "functionAppName" = "func-nightly-pipeline-test"
             "azureServiceConnection" = "Azure-Subscription-test-ai"
-
+            "acrName" = "stockmlacrtest"
         }
     },
     @{
@@ -81,6 +82,7 @@ $variableGroups = @(
             "resourceGroupName" = "rg-kunskapskontroll-ai-kurs-2-prod"
             "functionAppName" = "func-nightly-pipeline-prod"
             "azureServiceConnection" = "Azure-Subscription-prod-ai"
+            "acrName" = "stockmlacrprod"
         }
     }
 )
@@ -196,6 +198,19 @@ foreach ($rg in $resourceGroups) {
     Write-Host "Creating resource group: $rg"
     az group create --name $rg --location $Location
 }
+
+# Create ACR registry
+$acrName = "stockmlacrdev"
+$location = "swedencentral"
+
+Write-Host "Creating Azure Container Registry: $acrName"
+
+az acr create `
+  --name $acrName `
+  --resource-group $resourceGroups[0] `
+  --location $location `
+  --sku Basic `
+  --admin-enabled false
 
 Write-Host ""
 Write-Host "🎉 Infrastructure setup complete!"

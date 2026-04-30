@@ -69,13 +69,18 @@ resource dataContainer 'Microsoft.Storage/storageAccounts/blobServices/container
 }
 
 // ACR
-resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
+// resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' = {
+//  name: acrName
+//  location: location
+//  sku: { name: 'Basic' }
+//  properties: {
+//    adminUserEnabled: true
+//  }
+//}
+
+// Using existing ACR
+resource acr 'Microsoft.ContainerRegistry/registries@2023-01-01-preview' existing = {
   name: acrName
-  location: location
-  sku: { name: 'Basic' }
-  properties: {
-    adminUserEnabled: true
-  }
 }
 
 // Container Apps Environment
@@ -160,11 +165,14 @@ resource api 'Microsoft.App/containerApps@2023-05-01' = {
 resource funcPlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: '${namePrefix}-funcplan'
   location: location
+  kind: 'linux'
   sku: {
     name: 'Y1'
     tier: 'Dynamic'
-  }
-  kind: 'functionapp'
+  }  
+  properties: {
+    reserved: true
+  }  
 }
 
 resource funcApp 'Microsoft.Web/sites@2022-03-01' = {
@@ -178,7 +186,7 @@ resource funcApp 'Microsoft.Web/sites@2022-03-01' = {
     serverFarmId: funcPlan.id
     httpsOnly: true
     siteConfig: {
-      linuxFxVersion: 'PYTHON|3.11'
+      linuxFxVersion: 'Python|3.11'
       appSettings: [
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
         { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'python' }

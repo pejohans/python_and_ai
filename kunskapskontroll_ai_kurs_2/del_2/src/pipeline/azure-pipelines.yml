@@ -25,6 +25,9 @@ parameters:
 
 variables:
 - group: ${{ parameters.targetEnvironment }}-vars
+- name: namePrefix
+  value: stockml
+
 
 pool:
   vmImage: ubuntu-latest
@@ -44,6 +47,33 @@ stages:
         scriptLocation: inlineScript
         inlineScript: |
           set -euo pipefail
+
+          # -----------------------------
+          # Variables
+          # -----------------------------
+          IMAGE_NAME="${namePrefix}-api"
+          IMAGE_FULL="$(acrName).azurecr.io/$IMAGE_NAME"
+
+          echo "Using image: $IMAGE_FULL"
+          echo "Tags: ${{ parameters.targetEnvironment }}"
+
+          # -----------------------------
+          # Login to ACR
+          # -----------------------------
+          az acr login --name $(acrName)
+
+          # -----------------------------
+          # Build image with two tags
+          # -----------------------------
+          docker build \
+            -t $IMAGE_FULL:${{ parameters.targetEnvironment }} \
+            kunskapskontroll_ai_kurs_2/del_2/src/api
+
+          # -----------------------------
+          # Push both tags
+          # -----------------------------
+          docker push $IMAGE_FULL:${{ parameters.targetEnvironment }}
+
           az group create -n $(resourceGroupName) -l $(location)
 
           DEPLOYMENT_NAME="infra-${{ parameters.targetEnvironment }}-$(Build.BuildId)"
