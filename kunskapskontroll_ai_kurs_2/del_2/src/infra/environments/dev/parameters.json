@@ -6,13 +6,13 @@
       "value": "stockml"
     },
     "acrName": {
-      "value": "stockml-acr-dev"
+      "value": "stockmlacrdev"
     },
     "functionAppName": {
       "value": "func-nightly-pipeline-dev"
     },
     "storageAccountName": {
-      "value": "stockml-storage-dev"
+      "value": "stockmlstoragedev"
     },
     "blobContainerName": {
       "value": "stockml-container-dev"

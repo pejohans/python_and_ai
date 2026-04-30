@@ -8,7 +8,7 @@ $RepositoryUrl = "pejohans/python_and_ai"
 $AzureSubscriptionId = "3a369e7b-d227-4230-8129-7f490c05a663"
 $AzureSubscriptionName = "Visual Studio Premium med MSDN"
 $AzureTenantId = "b52ca394-3243-4498-ae53-64327da47493"
-$Location = "Sweden Central"
+$Location = "swedencentral"
 
 Write-Host "Running tenant-specific setup for $OrganizationUrl" -ForegroundColor Cyan
 Write-Host "Project: $ProjectName" -ForegroundColor Cyan
