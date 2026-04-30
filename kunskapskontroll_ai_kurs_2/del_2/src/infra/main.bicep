@@ -134,7 +134,13 @@ resource api 'Microsoft.App/containerApps@2023-05-01' = {
             weight: 100
           }
         ]
-      }
+      }    
+      registries: [
+        {
+          server: acr.properties.loginServer
+          identity: apiIdentity.id
+        }
+      ]
     }
     template: {
       containers: [
