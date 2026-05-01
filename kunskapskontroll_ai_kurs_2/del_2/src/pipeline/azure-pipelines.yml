@@ -132,16 +132,16 @@ stages:
 
     - script: |
         set -euo pipefail
-        cd src/functions
         python -m pip install --upgrade pip
         # Install dependencies into .python_packages for zip deploy
         pip install --target=".python_packages/lib/site-packages" -r requirements.txt
       displayName: 'Install Python deps into .python_packages'
+      workingDirectory: $(Build.SourcesDirectory)/kunskapskontroll_ai_kurs_2/del_2/src/functions
 
     - task: ArchiveFiles@2
       displayName: 'Archive Functions app'
       inputs:
-        rootFolderOrFile: '$(Build.SourcesDirectory)/src/functions'
+        rootFolderOrFile: '$(Build.SourcesDirectory)/kunskapskontroll_ai_kurs_2/del_2/src/functions'
         includeRootFolder: false
         archiveType: zip
         archiveFile: '$(Build.ArtifactStagingDirectory)/functions.zip'
@@ -175,6 +175,7 @@ stages:
         azureSubscription: $(azureServiceConnection)
         scriptType: bash
         scriptLocation: inlineScript
+        workingDirectory: $(Build.SourcesDirectory)/kunskapskontroll_ai_kurs_2/del_2
         inlineScript: |
           set -euo pipefail
           python -m pip install --upgrade pip

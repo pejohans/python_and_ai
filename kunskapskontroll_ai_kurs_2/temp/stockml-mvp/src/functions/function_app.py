@@ -2,7 +2,7 @@
 import os
 import json
 import logging
-import datetime
+from datetime import datetime
 
 import azure.functions as func
 import pandas as pd
@@ -20,7 +20,7 @@ def nightly_stockml_pipeline(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.warning('Timer is past due!')
 
-    run_date = datetime.datetime.utcnow().date().isoformat()
+    run_date = datetime.now(datetime.timezone.utc).date().isoformat()
     horizon_days = int(os.getenv("HORIZON_DAYS", "7"))
 
     logging.info(f"Starting nightly pipeline. date={run_date} horizon={horizon_days}")
