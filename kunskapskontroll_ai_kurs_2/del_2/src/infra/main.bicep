@@ -211,7 +211,7 @@ resource funcApp 'Microsoft.Web/sites@2022-03-01' = {
       appSettings: [
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
         { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'python' }
-        { name: 'AzureWebJobsStorage', value: stg.listKeys().keys[0].value }
+        { name: 'AzureWebJobsStorage', value: 'DefaultEndpointsProtocol=https;AccountName=${stg.name};AccountKey=${stg.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}' }
         { name: 'STORAGE_ACCOUNT_NAME', value: storageAccountName }
         { name: 'BLOB_CONTAINER_NAME', value: blobContainerName }
         { name: 'FEATURES_PATH_PREFIX', value: 'curated/omx30/features/horizon=7' }
