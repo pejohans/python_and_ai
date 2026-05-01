@@ -112,7 +112,7 @@ stages:
         resourceGroup: $(resourceGroupName)
         acrName: $(acrName)
         containerAppName: $(containerAppName)
-        appSourcePath: '$(Build.SourcesDirectory)/src/api'
+        appSourcePath: '$(Build.SourcesDirectory)/kunskapskontroll_ai_kurs_2/del_2/src/api'
         imageToBuild: '$(acrLoginServer)/$(apiRepoName):$(Build.BuildId)'
         imageToDeploy: '$(acrLoginServer)/$(apiRepoName):$(Build.BuildId)'
 
@@ -147,13 +147,19 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/functions.zip'
         replaceExistingArchive: true
 
-    - task: AzureFunctionApp@2
-      displayName: 'Deploy Functions via Zip'
+    - task: AzureCLI@2
+      displayName: 'Deploy Functions via Zip (Linux Consumption)'
       inputs:
         azureSubscription: $(azureServiceConnection)
-        appType: functionAppLinux
-        appName: $(functionAppNameOut)
-        package: '$(Build.ArtifactStagingDirectory)/functions.zip'
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -euo pipefail
+
+          az functionapp deployment source config-zip \
+            --resource-group rg-kunskapskontroll-ai-kurs-2-${{ parameters.targetEnvironment }} \
+            --name $(functionAppNameOut) \
+            --src $(Build.ArtifactStagingDirectory)/functions.zip
 
 - stage: Bootstrap
   displayName: 'Bootstrap model + folders in Blob (first run)'
