@@ -9,7 +9,7 @@ import joblib
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from mapie.regression import MapieRegressor
+from mapie.regression import MapieSplitConformalRegressor
 
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
@@ -55,9 +55,22 @@ def main():
     base = RandomForestRegressor(n_estimators=200, random_state=42)
     base.fit(X_train, y_train)
 
-    mapie = MapieRegressor(estimator=base, method='naive')
-    mapie.fit(X_train, y_train)
-    mapie.conformalize(X_cal, y_cal)
+    #mapie = MapieRegressor(estimator=base, method='naive')
+    #mapie.fit(X_train, y_train)
+    #mapie.conformalize(X_cal, y_cal)    
+    
+    mapie = MapieSplitConformalRegressor(
+        estimator=base,
+        confidence_level=0.95,   # motsvarar 95% intervall
+        random_state=42
+    )    
+    
+    mapie.fit(
+        X_train,
+        y_train,
+        X_calibration=X_cal,
+        y_calibration=y_cal
+    )
 
     # Serialize
     mb = io.BytesIO(); joblib.dump(base, mb)
