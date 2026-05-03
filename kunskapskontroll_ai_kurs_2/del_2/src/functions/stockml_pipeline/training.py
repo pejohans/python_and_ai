@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from mapie.regression import MapieSplitConformalRegressor
+from mapie.regression import SplitConformalRegressor
 
 
 FEATURE_COLS = ["reco_pos","reco_neg","reco_net","reco_pos_delta"]
@@ -39,7 +39,7 @@ def train_model(train_df: pd.DataFrame):
     #mapie.fit(X_train, y_train)
     #mapie.conformalize(X_cal, y_cal)
     
-    mapie = MapieSplitConformalRegressor(
+    mapie = SplitConformalRegressor(
         estimator=base,
         confidence_level=0.95,   # motsvarar 95% intervall
         random_state=42

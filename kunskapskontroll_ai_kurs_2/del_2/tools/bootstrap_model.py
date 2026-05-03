@@ -9,7 +9,7 @@ import joblib
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
-from mapie.regression import MapieSplitConformalRegressor
+from mapie.regression import SplitConformalRegressor
 
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
@@ -59,7 +59,7 @@ def main():
     #mapie.fit(X_train, y_train)
     #mapie.conformalize(X_cal, y_cal)    
     
-    mapie = MapieSplitConformalRegressor(
+    mapie = SplitConformalRegressor(
         estimator=base,
         confidence_level=0.95,   # motsvarar 95% intervall
         random_state=42
