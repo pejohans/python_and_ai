@@ -113,8 +113,8 @@ stages:
         acrName: $(acrName)
         containerAppName: $(containerAppName)
         appSourcePath: '$(Build.SourcesDirectory)/kunskapskontroll_ai_kurs_2/del_2/src/api'
-        imageToBuild: '$(acrLoginServer)/$(apiRepoName):$(Build.BuildId)'
-        imageToDeploy: '$(acrLoginServer)/$(apiRepoName):$(Build.BuildId)'
+        imageToBuild: '$(acrLoginServer)/$(namePrefix)-api:$(Build.BuildId)'
+        imageToDeploy: '$(acrLoginServer)/$(namePrefix)-api:$(Build.BuildId)'
 
 - stage: Functions
   displayName: 'Build & Deploy Azure Functions (Python)'
