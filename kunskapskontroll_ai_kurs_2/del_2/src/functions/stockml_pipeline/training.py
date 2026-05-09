@@ -41,7 +41,7 @@ def train_model(train_df: pd.DataFrame):
     
     mapie = SplitConformalRegressor(
         estimator=base,
-        confidence_level=0.95   # motsvarar 95% intervall
+        confidence_level=0.9   # motsvarar 90% intervall
     )    
     
     mapie.fit(
