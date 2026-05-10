@@ -1,6 +1,20 @@
-
+import yfinance as yf
 import pandas as pd
 import numpy as np
+
+def fetch_price_data(symbols, lookback_days=40) -> pd.DataFrame:
+    """
+    Fetch closing prices for all symbols at once.
+
+    Returns:
+        DataFrame: index = date, columns = symbols
+    """
+    df = yf.download(symbols, period=f"{lookback_days}d")["Close"]
+
+    if df.empty:
+        raise ValueError("No price data fetched")
+
+    return df
 
 
 def fetch_recommendations(symbol: str) -> pd.DataFrame:

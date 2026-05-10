@@ -3,11 +3,12 @@ import argparse
 import io
 import json
 import datetime
+from pyexpat import model
 import numpy as np
 import pandas as pd
 import joblib
 
-from sklearn.ensemble import RandomForestRegressor
+from lightgbm import LGBMRegressor
 from sklearn.model_selection import train_test_split
 from mapie.regression import SplitConformalRegressor
 
@@ -38,38 +39,61 @@ def main():
     # Create a tiny baseline dataset (synthetic) so API can start.
     symbols = ["ERIC-B","VOLV-B","ATCO-A","ATCO-B","SAND","SEB-A","SWED-A","SHB-A","NDA-SE","TELIA"]
     rng = np.random.default_rng(42)
+   
     feats = pd.DataFrame({
         "symbol": symbols,
-        "reco_pos": rng.uniform(0.3, 0.8, len(symbols)),
-        "reco_neg": rng.uniform(0.0, 0.4, len(symbols)),
-        "reco_net": rng.uniform(-0.2, 0.4, len(symbols)),
-        "reco_pos_delta": rng.normal(0.0, 0.05, len(symbols)),
+        "symbol_id": range(len(symbols)),   # ✅ needed
+        "ret_1d": rng.normal(0, 0.01, len(symbols)),
+        "ret_3d": rng.normal(0, 0.02, len(symbols)),
+        "ret_7d": rng.normal(0, 0.03, len(symbols)),
+        "vol_7d": rng.uniform(0.01, 0.05, len(symbols)),
+        "vol_14d": rng.uniform(0.01, 0.06, len(symbols)),
+        "price_vs_ma5": rng.uniform(0.95, 1.05, len(symbols)),
+        "price_vs_ma10": rng.uniform(0.95, 1.05, len(symbols)),
+        "recent_price": rng.uniform(50, 300, len(symbols)),   # ✅ IMPORTANT
         "as_of_date": datetime.date.today().isoformat()
     })
-    feats["y"] = feats["reco_net"] * 0.05 + rng.normal(0, 0.02, len(symbols))
 
-    X = feats[["reco_pos","reco_neg","reco_net","reco_pos_delta"]].values
-    y = feats["y"].values
+    #feats["y"] = feats["reco_net"] * 0.05 + rng.normal(0, 0.02, len(symbols))
+    feats["target_return"] = rng.normal(0, 0.03, len(symbols))
+
+    #X = feats[["reco_pos","reco_neg","reco_net","reco_pos_delta"]].values
+    
+    features = [
+        "symbol_id",
+        "ret_1d",
+        "ret_3d",
+        "ret_7d",
+        "vol_7d",
+        "vol_14d",
+        "price_vs_ma5",
+        "price_vs_ma10"
+    ]
+    X = feats[features].values
+
+    y = feats["target_return"].values
 
     X_train, X_cal, y_train, y_cal = train_test_split(X, y, test_size=0.2, random_state=42)
-    base = RandomForestRegressor(n_estimators=200, random_state=42)
+    #base = RandomForestRegressor(n_estimators=200, random_state=42)   
+    
+    base = LGBMRegressor(
+        learning_rate=0.01,
+        max_depth=5,
+        n_estimators=100,
+        num_leaves=31,
+        random_state=42
+    )
     base.fit(X_train, y_train)
 
-    #mapie = MapieRegressor(estimator=base, method='naive')
-    #mapie.fit(X_train, y_train)
-    #mapie.conformalize(X_cal, y_cal)    
-    
     mapie = SplitConformalRegressor(
         estimator=base,
-        confidence_level=0.95   # motsvarar 95% intervall
-    )    
-    
-    mapie.fit(
-        X_train,
-        y_train,
-        X_calibration=X_cal,
-        y_calibration=y_cal
+        confidence_level=0.9,   # motsvarar 90% intervall
+        prefit=True #Train model first, then conformalize with calibration set
     )
+    mapie.conformalize(X_cal, y_cal)
+
+    #TODO: Why do I need this? I think it's because the model needs to know how to convert symbol_id back to symbol for the API to work. But maybe there's a better way to do this?
+    symbol_map = {s: i for i, s in enumerate(symbols)}
 
     # Serialize
     mb = io.BytesIO(); joblib.dump(base, mb)
@@ -78,20 +102,37 @@ def main():
     # Upload model
     upload(bs, args.container, f"{args.models_prefix}/model.joblib", mb.getvalue())
     upload(bs, args.container, f"{args.models_prefix}/mapie.joblib", pb.getvalue())
+    
+    
+    sb = io.BytesIO(); joblib.dump(symbol_map, sb)
+    upload(bs, args.container, f"{args.models_prefix}/symbol_map.joblib", sb.getvalue())
+
+    fb2 = io.BytesIO(); joblib.dump(features, fb2)
+    upload(bs, args.container, f"{args.models_prefix}/features.joblib", fb2.getvalue())
+
 
     metadata = {
         "run_date": datetime.date.today().isoformat(),
         "horizon_days": 7,
-        "note": "bootstrap synthetic baseline model - replace with nightly trained model"
+        "model_type": "LGBM + SplitConformalRegressor",
+        "features": features,
+        "confidence_level": 0.9,
+        "note": "bootstrap baseline model using synthetic financial features - replace with nightly trained model"
     }
     upload(bs, args.container, f"{args.models_prefix}/metadata.json", json.dumps(metadata, indent=2).encode('utf-8'))
 
     # Upload features parquet + latest pointer
-    fb = io.BytesIO(); feats.drop(columns=['y']).to_parquet(fb, index=False)
+    fb = io.BytesIO(); feats.drop(columns=['target_return']).to_parquet(fb, index=False)
     features_blob = f"{args.features_prefix}/latest/features.parquet"
     upload(bs, args.container, features_blob, fb.getvalue())
 
-    latest_ptr = {"features_blob": features_blob, "run_date": metadata["run_date"], "horizon_days": 7}
+    latest_ptr = {
+        "features_blob": features_blob,         
+        #"model_blob": f"{MODELS_PREFIX}/model.joblib", #TODO: Need to pass prefix from azure-pipelines.yml file
+        #"mapie_blob": f"{MODELS_PREFIX}/mapie.joblib", #TODO: Need to pass prefix from azure-pipelines.yml file
+        "run_date": metadata["run_date"], 
+        "horizon_days": 7
+        }
     upload(bs, args.container, f"{args.features_prefix}/_latest.json", json.dumps(latest_ptr, indent=2).encode('utf-8'))
 
     print('Bootstrap complete.')

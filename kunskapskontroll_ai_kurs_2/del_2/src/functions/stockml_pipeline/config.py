@@ -1,5 +1,6 @@
 
 import os
+import pandas as pd
 
 BLOB_CONTAINER_NAME = os.getenv("BLOB_CONTAINER_NAME", "stockml")
 STORAGE_ACCOUNT_NAME = os.getenv("STORAGE_ACCOUNT_NAME", "")
@@ -16,5 +17,9 @@ OMX30_SYMBOLS = os.getenv(
 )
 
 
-def get_symbols():
-    return [s.strip().upper() for s in OMX30_SYMBOLS.split(",") if s.strip()]
+def get_symbols():    
+    base_dir = os.path.dirname(__file__)   # ✅ location of config.py
+    csv_path = os.path.join(base_dir, "omx30_yfinance.csv")
+
+    df = pd.read_csv(csv_path)
+    return df["ticker"].dropna().astype(str).str.strip().tolist()
