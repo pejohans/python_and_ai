@@ -183,6 +183,32 @@ stages:
       inputs:
         versionSpec: '3.11'
 
+    
+    - task: AzureCLI@2
+      displayName: 'Assign Blob Data Contributor role'
+      inputs:
+        azureSubscription: $(azureServiceConnection)
+        scriptType: bash
+        scriptLocation: inlineScript
+        inlineScript: |
+          set -euo pipefail
+
+          echo "Assigning Blob Data Contributor role..."
+
+          SP_ID=$(az account show --query user.name -o tsv)
+
+          echo "Service Principal ID: $SP_ID"
+
+          STORAGE_SCOPE="/subscriptions/$(az account show --query id -o tsv)/resourceGroups/$(resourceGroupName)/providers/Microsoft.Storage/storageAccounts/$(storageAccountName)"
+
+          az role assignment create \
+            --assignee $SP_ID \
+            --role "Storage Blob Data Contributor" \
+            --scope $STORAGE_SCOPE || true
+
+          echo "Waiting for RBAC propagation..."
+          sleep 30
+          
     - task: AzureCLI@2
       displayName: 'Create and upload baseline model + pointers'
       inputs:
