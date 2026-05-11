@@ -72,8 +72,8 @@ def run_nightly_pipeline(run_date: str, horizon_days: int = 7):
     # write latest pointer
     latest_ptr = {
         "features_blob": features_blob,        
-        #"model_blob": f"{MODELS_PREFIX}/model.joblib", #TODO: Implement later when bootstrap_model.py gets prefix as input
-        #"mapie_blob": f"{MODELS_PREFIX}/mapie.joblib", #TODO: Implement later when bootstrap_model.py gets prefix as input
+        #"model_blob": f"{MODELS_PREFIX}/model.joblib", #TODO: Implement later when needed (in order to be able to load model from same place, right now we hard code the path to blob storage, which might not be a problem) bootstrap_model.py gets prefix as input
+        #"mapie_blob": f"{MODELS_PREFIX}/mapie.joblib", #TODO: Implement later when needed (in order to be able to load model from same place, right now we hard code the path to blob storage, which might not be a problem) bootstrap_model.py gets prefix as input
         "run_date": run_date,
         "horizon_days": horizon_days
     }

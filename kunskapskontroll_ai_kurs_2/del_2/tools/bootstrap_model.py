@@ -128,8 +128,8 @@ def main():
 
     latest_ptr = {
         "features_blob": features_blob,         
-        #"model_blob": f"{MODELS_PREFIX}/model.joblib", #TODO: Need to pass prefix from azure-pipelines.yml file
-        #"mapie_blob": f"{MODELS_PREFIX}/mapie.joblib", #TODO: Need to pass prefix from azure-pipelines.yml file
+        #"model_blob": f"{MODELS_PREFIX}/model.joblib", #TODO: Need to pass prefix from azure-pipelines.yml file. Implement later if needed to load model from same place, right now we hard code the path to blob storage, which might not be a problem
+        #"mapie_blob": f"{MODELS_PREFIX}/mapie.joblib", #TODO: Need to pass prefix from azure-pipelines.yml file. Implement later if needed to load model from same place, right now we hard code the path to blob storage, which might not be a problem
         "run_date": metadata["run_date"], 
         "horizon_days": 7
         }
