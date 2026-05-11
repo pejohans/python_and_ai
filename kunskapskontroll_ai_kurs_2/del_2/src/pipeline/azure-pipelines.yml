@@ -193,7 +193,7 @@ stages:
         inlineScript: |
           set -euo pipefail
           python -m pip install --upgrade pip
-          pip install joblib numpy pandas scikit-learn mapie azure-identity azure-storage-blob pyarrow
+          pip install joblib numpy pandas scikit-learn mapie lightgbm azure-identity azure-storage-blob pyarrow
 
           python tools/bootstrap_model.py \
             --storage-account $(storageAccountName) \
