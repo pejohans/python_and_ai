@@ -7,7 +7,7 @@ import datetime
 import azure.functions as func
 import pandas as pd
 
-#from stockml_pipeline.pipeline import run_nightly_pipeline
+from stockml_pipeline.pipeline import run_nightly_pipeline
 
 app = func.FunctionApp()
 
@@ -24,5 +24,5 @@ def nightly_stockml_pipeline(mytimer: func.TimerRequest) -> None:
     horizon_days = int(os.getenv("HORIZON_DAYS", "7"))
 
     logging.info(f"Starting nightly pipeline. date={run_date} horizon={horizon_days}")
-    #run_nightly_pipeline(run_date=run_date, horizon_days=horizon_days)
+    run_nightly_pipeline(run_date=run_date, horizon_days=horizon_days)
     logging.info("Nightly pipeline completed")

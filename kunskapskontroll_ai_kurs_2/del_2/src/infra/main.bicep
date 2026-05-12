@@ -182,19 +182,20 @@ resource acrPull 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   }
 }
 
-// Function App (Linux Consumption) + Managed Identity
+// Function App (Linux Premium plan) + Managed Identity
 resource funcPlan 'Microsoft.Web/serverfarms@2022-03-01' = {
   name: '${namePrefix}-funcplan'
   location: location
   kind: 'linux'
   sku: {
-    name: 'Y1'
-    tier: 'Dynamic'
-  }  
+    name: 'EP1'
+    tier: 'ElasticPremium'
+  }
   properties: {
     reserved: true
-  }  
+  }
 }
+
 
 resource funcApp 'Microsoft.Web/sites@2022-03-01' = {
   name: functionAppName
@@ -209,6 +210,7 @@ resource funcApp 'Microsoft.Web/sites@2022-03-01' = {
     siteConfig: {
       linuxFxVersion: 'Python|3.11'
       appSettings: [
+        { name: 'AzureWebJobsFeatureFlags', value: 'EnableWorkerIndexing' }
         { name: 'FUNCTIONS_EXTENSION_VERSION', value: '~4' }
         { name: 'FUNCTIONS_WORKER_RUNTIME', value: 'python' }
         { name: 'AzureWebJobsStorage', value: 'DefaultEndpointsProtocol=https;AccountName=${stg.name};AccountKey=${stg.listKeys().keys[0].value};EndpointSuffix=${environment().suffixes.storage}' }
