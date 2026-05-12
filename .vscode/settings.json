@@ -1,3 +1,4 @@
 {
-    "python-envs.pythonProjects": []
+    "python-envs.pythonProjects": [],
+    "azureFunctions.projectSubpath": "kunskapskontroll_ai_kurs_2\\del_2\\src\\functions"
 }
