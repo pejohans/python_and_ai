@@ -152,6 +152,13 @@ stages:
         archiveFile: '$(Build.ArtifactStagingDirectory)/functions.zip'
         replaceExistingArchive: true
 
+    #For debugging purposes, let's inspect the content of the ZIP before deployment
+    - script: |
+        echo "📦 ZIP CONTENT:"
+        unzip -l $(Build.ArtifactStagingDirectory)/functions.zip
+      displayName: 'Inspect ZIP content'
+
+
     - task: AzureCLI@2
       displayName: 'Deploy Functions via Zip (Linux Consumption)'
       inputs:
@@ -208,7 +215,7 @@ stages:
 
           echo "Waiting for RBAC propagation..."
           sleep 30
-          
+
     - task: AzureCLI@2
       displayName: 'Create and upload baseline model + pointers'
       inputs:
