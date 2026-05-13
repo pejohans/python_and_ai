@@ -1,20 +1,44 @@
 import yfinance as yf
 import pandas as pd
 import numpy as np
+import logging
+import time
 
 def fetch_price_data(symbols, lookback_days=40) -> pd.DataFrame:
-    """
-    Fetch closing prices for all symbols at once.
+    all_data = []
 
-    Returns:
-        DataFrame: index = date, columns = symbols
-    """
-    df = yf.download(symbols, period=f"{lookback_days}d")["Close"]
+    for symbol in symbols:
+        for attempt in range(3):  # ✅ retry loop
+            try:
+                df = yf.download(
+                    symbol,
+                    period=f"{lookback_days}d",
+                    progress=False
+                )
 
-    if df.empty:
-        raise ValueError("No price data fetched")
+                if df is None or df.empty:
+                    logging.warning(f"{symbol}: empty response (attempt {attempt+1})")
+                    time.sleep(2)
+                    continue
 
-    return df
+                df = df[["Close"]].rename(columns={"Close": symbol})
+                all_data.append(df)
+                break  # ✅ success → exit retry loop
+
+            except Exception as e:
+                logging.warning(f"{symbol}: failed (attempt {attempt+1}) → {e}")
+                time.sleep(2)
+
+    if not all_data:
+        logging.error("No symbols fetched — skipping run")
+        return pd.DataFrame()   # ✅ do NOT crash
+
+    # ✅ merge data
+    result = pd.concat(all_data, axis=1)
+
+    logging.info(f"Fetched data for {len(result.columns)} symbols")
+
+    return result
 
 
 def fetch_recommendations(symbol: str) -> pd.DataFrame:
