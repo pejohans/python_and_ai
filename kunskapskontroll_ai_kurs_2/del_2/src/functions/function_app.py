@@ -2,9 +2,8 @@
 import os
 import logging
 import datetime
-
 import azure.functions as func
-from stockml_pipeline.pipeline import run_nightly_pipeline
+
 
 app = func.FunctionApp()
 
@@ -16,6 +15,9 @@ TIMER_SCHEDULE = os.getenv("TIMER_SCHEDULE", "0 0 1 * * *")
 def nightly_stockml_pipeline(mytimer: func.TimerRequest) -> None:
     if mytimer.past_due:
         logging.warning('Timer is past due!')
+    
+    #Lazy import to speed up function startup time
+    from stockml_pipeline.pipeline import run_nightly_pipeline
 
     run_date = datetime.datetime.now(datetime.timezone.utc).date().isoformat()
     horizon_days = int(os.getenv("HORIZON_DAYS", "7"))
