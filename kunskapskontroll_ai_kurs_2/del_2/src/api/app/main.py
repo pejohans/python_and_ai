@@ -19,6 +19,7 @@ class PredictResponse(BaseModel):
     confidence: float
     model_version: str | None = None
     generated_at: str
+    current_price: float
 
 
 @app.get('/health')
@@ -42,9 +43,13 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
     try:
         _, mapie = load_model_bundle()
         X = get_features_for_symbol(s)
+        
+        # Extract current price
+        current_price = float(X["current_price"].iloc[0])
+        
         alpha = 1.0 - confidence
         y_pred, y_pis = mapie.predict(X.values, alpha=alpha)
-
+        
         # MAPIE returns prediction intervals; shape differs by version. Handle common shape.
         # Expect y_pis: (n_samples, 2, n_alpha)
         lower = float(y_pis[0, 0, 0])
@@ -58,7 +63,8 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
             upper_return=upper,
             confidence=confidence,
             model_version=None,
-            generated_at=datetime.now(timezone.utc).isoformat()
+            generated_at=datetime.now(timezone.utc).isoformat(),
+            current_price=current_price
         )
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
