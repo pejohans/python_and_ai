@@ -2,6 +2,7 @@
 import os
 import io
 import json
+import logging
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import BlobServiceClient
 
@@ -17,12 +18,18 @@ def get_blob_service(account_name: str) -> BlobServiceClient:
 
 
 def download_bytes(bs: BlobServiceClient, container: str, blob_path: str) -> bytes:
+    
+    logging.info(f"Downloading blob: container={container}, blob_path={blob_path}")
+    
     bc = bs.get_blob_client(container=container, blob=blob_path)
     stream = bc.download_blob()
     return stream.readall()
 
 
 def download_json(bs: BlobServiceClient, container: str, blob_path: str):
+    
+    logging.info(f"Downloading JSON blob: container={container}, blob_path={blob_path}")
+    
     data = download_bytes(bs, container, blob_path)
     return json.loads(data.decode('utf-8'))
 

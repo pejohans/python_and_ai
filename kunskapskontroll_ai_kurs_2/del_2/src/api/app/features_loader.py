@@ -1,6 +1,7 @@
 
 import io
 import pandas as pd
+import logging
 from functools import lru_cache
 from .settings import settings
 from .blob_store import get_blob_service, download_bytes
@@ -12,6 +13,11 @@ def load_latest_features_df():
     # If you prefer partitioned by date only, change this to list and pick latest.
     if not settings.storage_account_name:
         raise RuntimeError("STORAGE_ACCOUNT_NAME is not set")
+    
+    logging.info("Loading latest features...")
+    logging.info(f"Using storage account: {settings.storage_account_name}")
+    logging.info(f"Using blob container: {settings.blob_container_name}")
+    logging.info(f"Using features prefix: {settings.features_prefix}")
 
     bs = get_blob_service(settings.storage_account_name)
     latest_ptr = f"{settings.features_prefix}/_latest.json"

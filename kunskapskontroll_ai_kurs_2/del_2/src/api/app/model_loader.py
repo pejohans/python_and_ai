@@ -1,6 +1,7 @@
 
 import io
 import joblib
+import logging
 from functools import lru_cache
 from .settings import settings
 from .blob_store import get_blob_service, download_bytes
@@ -10,6 +11,12 @@ from .blob_store import get_blob_service, download_bytes
 def load_model_bundle():
     if not settings.storage_account_name:
         raise RuntimeError("STORAGE_ACCOUNT_NAME is not set")
+    
+    logging.info("Loading model bundle...")
+    
+    logging.info(f"Using storage account: {settings.storage_account_name}")
+    logging.info(f"Using blob container: {settings.blob_container_name}")
+    logging.info(f"Using models prefix: {settings.models_prefix}")
 
     bs = get_blob_service(settings.storage_account_name)
     model_blob = f"{settings.models_prefix}/model.joblib"
