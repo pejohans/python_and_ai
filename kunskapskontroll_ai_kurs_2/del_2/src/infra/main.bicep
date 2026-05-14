@@ -154,6 +154,7 @@ resource api 'Microsoft.App/containerApps@2023-05-01' = {
             { name: 'MODELS_PATH_PREFIX', value: 'models/omx30/horizon=7' }
             { name: 'HORIZON_DAYS', value: '7' }
             { name: 'OMX30_SYMBOLS', value: omx30Symbols }
+            { name: 'AZURE_CLIENT_ID', value: apiIdentity.properties.clientId }
           ]
           resources: {
             cpu: any('0.5')
@@ -253,6 +254,11 @@ resource storageBlobDataContributor 'Microsoft.Authorization/roleDefinitions@202
 resource apiBlobReaderAssignment 'Microsoft.Authorization/roleAssignments@2022-04-01' = {
   name: guid(stg.id, apiIdentity.id, storageBlobDataReader.id)
   scope: stg
+  
+  dependsOn: [
+    api
+  ]
+
   properties: {
     principalId: apiIdentity.properties.principalId
     roleDefinitionId: storageBlobDataReader.id
