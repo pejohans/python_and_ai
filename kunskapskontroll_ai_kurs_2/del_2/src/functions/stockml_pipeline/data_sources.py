@@ -3,11 +3,14 @@ import pandas as pd
 import numpy as np
 import logging
 import time
+import traceback
 
 def fetch_price_data(symbols, lookback_days=40) -> pd.DataFrame:
     all_data = []
 
     for symbol in symbols:
+        success = False
+        
         for attempt in range(3):  # ✅ retry loop
             try:
                 df = yf.download(
@@ -15,19 +18,38 @@ def fetch_price_data(symbols, lookback_days=40) -> pd.DataFrame:
                     period=f"{lookback_days}d",
                     progress=False
                 )
-
+                
+                logging.info(f"Fetched data for {symbol}: DF={df} - {len(df)} rows")
+                
+                if df is not None and not df.empty:
+                    success = True
+                    df = df[["Close"]].rename(columns={"Close": symbol})
+                    all_data.append(df)
+                    break  # ✅ success → exit retry loop
+                
                 if df is None or df.empty:
-                    logging.warning(f"{symbol}: empty response (attempt {attempt+1})")
+                    logging.warning(f"{symbol}: empty response (attempt {attempt+1}) - DF={df}")
                     time.sleep(2)
-                    continue
-
-                df = df[["Close"]].rename(columns={"Close": symbol})
-                all_data.append(df)
-                break  # ✅ success → exit retry loop
+                    continue               
 
             except Exception as e:
-                logging.warning(f"{symbol}: failed (attempt {attempt+1}) → {e}")
+                logging.warning(f"{symbol}: failed (attempt {attempt+1}) → {e}")                
+                logging.error(f"{symbol}: exception occurred")
+                logging.error(traceback.format_exc())
                 time.sleep(2)
+                
+        # After retries, if still not successful, log detailed info
+        if not success:
+            try:
+                import requests
+                r = requests.get(f"https://query1.finance.yahoo.com/v7/finance/download/{symbol}")
+
+                logging.error(f"{symbol}: HTTP test status={r.status_code}")
+                logging.error(f"{symbol}: response snippet={r.text[:200]}")
+
+            except Exception as e:
+                logging.error(f"{symbol}: HTTP test failed: {e}")
+            
 
     if not all_data:
         logging.error("No symbols fetched — skipping run")
