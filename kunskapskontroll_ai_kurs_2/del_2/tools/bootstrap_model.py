@@ -92,7 +92,7 @@ def main():
     )
     mapie.conformalize(X_cal, y_cal)
 
-    #TODO: Why do I need this? I think it's because the model needs to know how to convert symbol_id back to symbol for the API to work. But maybe there's a better way to do this?
+    # Mapping from symbol to symbol_id for later use in API
     symbol_map = {s: i for i, s in enumerate(symbols)}
 
     # Serialize
