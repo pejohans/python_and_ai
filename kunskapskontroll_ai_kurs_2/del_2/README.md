@@ -1,5 +1,8 @@
 ## Inledning
-I denna fil beskrivs repo-strukturen för det AI Ticker-system som är byggt.
+Detta är ett system för att predikera ett tänkt pris-spann för en aktie. Det är aldrig tänkt att försöka pricka exakta aktiepriser då det är näst intill omöjligt med tanke på alla de variabler som kan påverka en akties pris. Detta är också en första version, en MVP för att ge användare av systemet en indikation om vart en aktie är påväg och inom vilket pris-spann en aktie kan tänkas landa om 7 dagar. En vekas tid är inte lång tid vilket betyder att mer tekniska variabler har större betydelse än mer långsiktiga variabler såsom analytikers rekommendationer, bolagsrapporter och sentiment samt icke att förglömma omvärldsbevakning. 
+Du hittar mer detaljerad information i den EDA som också finns att tillgå i filen analys.ipynb.
+
+
 Lösningen består av flera delar:
 1. Ett FastAPI (skriven in Python) som klienter kan ställa frågor mot för att få en prediktion för en aktie. Själva Api:et läser upp en redan tränad modell (från blob storage)
 för att snabbt kunna göra en prediktion och skicka tillbaka ett svar till användaren.
@@ -10,6 +13,16 @@ för att snabbt kunna göra en prediktion och skicka tillbaka ett svar till anv�
 Dessa skript kopplar upp sig mot min Azure tenant (behövs dock en token för att få behörighet) och skapar upp vissa förutsättningar i både Azure och AzureDevOps så att den pipeline som också skapas av skriptet kan köras. Så,
 det är lite av en tvåstegs-raket skulle man kunna säga innan allt är uppe och rullar. Du ser nedan i repo-strukturen där vi både har scripts, infra, pipelines och tools-kataloger som alla kommer i spel när man kör igång 
 PowerShell-skriptet setup-all.ps1
+
+## Signifikanta delar/komponenter
+1. Analys.ipynb - Denna del innehåller min EDA för AI Ticker systemet
+2. src/api/app/main.py - Denna komponent är den app (FastAPI) som tar emot en aktie och tidshorisont för att göra en prediktion. 
+3. src/api/app/feature_loader.py - 
+4. src/api/app/model_loader.py - 
+5. src/functions/function_app.py - 
+6. src/functions/stockml_pipeline/pipeline.py - 
+7. src/functions/stockml_pipeline/training.py - 
+8. src/functions/stockml_pipeline/feature_engineering.py - 
 
 ## Repo-struktur
 - `src/api/` – FastAPI inference API (containeriserad)
