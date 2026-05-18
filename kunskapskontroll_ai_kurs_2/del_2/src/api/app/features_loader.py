@@ -6,6 +6,8 @@ from functools import lru_cache
 from .settings import settings
 from .blob_store import get_blob_service, download_bytes
 
+logger = logging.getLogger(__name__)
+
 
 @lru_cache(maxsize=8)
 def load_latest_features_df():
@@ -14,10 +16,10 @@ def load_latest_features_df():
     if not settings.storage_account_name:
         raise RuntimeError("STORAGE_ACCOUNT_NAME is not set")
     
-    logging.info("Loading latest features...")
-    logging.info(f"Using storage account: {settings.storage_account_name}")
-    logging.info(f"Using blob container: {settings.blob_container_name}")
-    logging.info(f"Using features prefix: {settings.features_prefix}")
+    logger.info("Loading latest features...")
+    logger.info(f"Using storage account: {settings.storage_account_name}")
+    logger.info(f"Using blob container: {settings.blob_container_name}")
+    logger.info(f"Using features prefix: {settings.features_prefix}")
 
     bs = get_blob_service(settings.storage_account_name)
     latest_ptr = f"{settings.features_prefix}/_latest.json"

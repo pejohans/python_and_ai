@@ -11,10 +11,16 @@ from .features_loader import get_features_for_symbol
 app = FastAPI(title="StockML MVP API", version="0.1.0")
 
 # Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
+root_logger = logging.getLogger()
+
+for handler in root_logger.handlers:
+    handler.setFormatter(
+        logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
+    )
+
+root_logger.setLevel(logging.INFO)
+logging.getLogger("azure").setLevel(logging.WARNING)
+
 
 class PredictResponse(BaseModel):
     symbol: str
