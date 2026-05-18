@@ -75,9 +75,9 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         # Extract recent price
         recent_price = float(X["recent_price"].iloc[0])
         
-        alpha = 1.0 - confidence        
+        #alpha = 1.0 - confidence
         X_model = X[feature_cols].values # Ensure correct feature order and convert to numpy array
-        y_pred, y_pis = mapie.predict(X_model, alpha=alpha) # Prediction with our stored features.
+        y_pred, y_pis = mapie.predict(X_model) # Prediction with our stored features.
         
         # MAPIE returns prediction intervals; shape differs by version. Handle common shape.
         # Expect y_pis: (n_samples, 2, n_alpha)
