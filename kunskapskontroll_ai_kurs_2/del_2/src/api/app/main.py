@@ -1,4 +1,5 @@
 
+import logging
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from datetime import datetime, timezone
@@ -9,6 +10,11 @@ from .features_loader import get_features_for_symbol
 
 app = FastAPI(title="StockML MVP API", version="0.1.0")
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 class PredictResponse(BaseModel):
     symbol: str
