@@ -59,7 +59,7 @@ def compute_features_for_symbol(
         "price_vs_ma10": float(recent_price / ma10),
 
         # Needed later for prediction scaling
-        "current_price": float(recent_price),
+        "recent_price": float(recent_price),
 
         "as_of_date": as_of_date
     }

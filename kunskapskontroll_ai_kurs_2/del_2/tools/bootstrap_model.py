@@ -50,7 +50,7 @@ def main():
         "vol_14d": rng.uniform(0.01, 0.06, len(symbols)),
         "price_vs_ma5": rng.uniform(0.95, 1.05, len(symbols)),
         "price_vs_ma10": rng.uniform(0.95, 1.05, len(symbols)),
-        "current_price": rng.uniform(50, 300, len(symbols)), 
+        "recent_price": rng.uniform(50, 300, len(symbols)), 
         "as_of_date": datetime.date.today().isoformat()
     })
 

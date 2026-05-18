@@ -40,7 +40,7 @@ class PredictResponse(BaseModel):
     confidence: float
     model_version: str | None = None
     generated_at: str
-    current_price: float
+    recent_price: float
 
 
 @app.get('/health')
@@ -72,8 +72,8 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         
         logger.warning(f"Features for symbol {s}: {X.shape[0]} samples")
         
-        # Extract current price
-        current_price = float(X["current_price"].iloc[0])
+        # Extract recent price
+        recent_price = float(X["recent_price"].iloc[0])
         
         alpha = 1.0 - confidence        
         X_model = X[feature_cols].values # Ensure correct feature order and convert to numpy array
@@ -95,7 +95,7 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
             confidence=confidence,
             model_version=None,
             generated_at=datetime.now(timezone.utc).isoformat(),
-            current_price=current_price
+            recent_price=recent_price
         )
     except Exception as e:
         logger.error(f"Error occurred while making prediction for symbol {s}: {e}")
