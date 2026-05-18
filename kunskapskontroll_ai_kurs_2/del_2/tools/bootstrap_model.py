@@ -42,7 +42,7 @@ def main():
    
     feats = pd.DataFrame({
         "symbol": symbols,
-        "symbol_id": range(len(symbols)),   # ✅ needed
+        "symbol_id": range(len(symbols)), 
         "ret_1d": rng.normal(0, 0.01, len(symbols)),
         "ret_3d": rng.normal(0, 0.02, len(symbols)),
         "ret_7d": rng.normal(0, 0.03, len(symbols)),
@@ -50,7 +50,7 @@ def main():
         "vol_14d": rng.uniform(0.01, 0.06, len(symbols)),
         "price_vs_ma5": rng.uniform(0.95, 1.05, len(symbols)),
         "price_vs_ma10": rng.uniform(0.95, 1.05, len(symbols)),
-        "recent_price": rng.uniform(50, 300, len(symbols)),   # ✅ IMPORTANT
+        "current_price": rng.uniform(50, 300, len(symbols)), 
         "as_of_date": datetime.date.today().isoformat()
     })
 

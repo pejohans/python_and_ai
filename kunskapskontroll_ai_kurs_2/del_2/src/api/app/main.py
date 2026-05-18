@@ -65,7 +65,7 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
 
     try:
         logger.warning("Calling load_model_bundle()")
-        _, mapie = load_model_bundle()
+        _, mapie, feature_cols = load_model_bundle()
         
         logger.warning("Calling get_features_for_symbol()")
         X = get_features_for_symbol(s)
@@ -75,8 +75,9 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         # Extract current price
         current_price = float(X["current_price"].iloc[0])
         
-        alpha = 1.0 - confidence
-        y_pred, y_pis = mapie.predict(X.values, alpha=alpha)
+        alpha = 1.0 - confidence        
+        X_model = X[feature_cols].values # Ensure correct feature order and convert to numpy array
+        y_pred, y_pis = mapie.predict(X_model, alpha=alpha) # Prediction with our stored features.
         
         # MAPIE returns prediction intervals; shape differs by version. Handle common shape.
         # Expect y_pis: (n_samples, 2, n_alpha)
