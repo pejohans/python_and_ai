@@ -16,20 +16,39 @@ def load_latest_features_df():
     if not settings.storage_account_name:
         raise RuntimeError("STORAGE_ACCOUNT_NAME is not set")
     
-    logger.info("Loading latest features...")
-    logger.info(f"Using storage account: {settings.storage_account_name}")
-    logger.info(f"Using blob container: {settings.blob_container_name}")
-    logger.info(f"Using features prefix: {settings.features_prefix}")
+    logger.warning("Loading latest features...")
+    logger.warning(f"Using storage account: {settings.storage_account_name}")
+    logger.warning(f"Using blob container: {settings.blob_container_name}")
+    logger.warning(f"Using features prefix: {settings.features_prefix}")
 
     bs = get_blob_service(settings.storage_account_name)
+    
+    #Only for debugging
+    container = bs.get_container_client(settings.blob_container_name)
+    prefix = settings.features_prefix.rstrip("/") + "/"
+    logger.warning(f"Listing blobs under prefix: {prefix}")
+    for b in container.list_blobs(name_starts_with=prefix):
+        logger.warning(f"FOUND FEATURE BLOB: {b.name}")
+    #End of debugging
+
+    
+    
     latest_ptr = f"{settings.features_prefix}/_latest.json"
     ptr = None
     try:
         ptr_bytes = download_bytes(bs, settings.blob_container_name, latest_ptr)
         ptr = pd.read_json(io.BytesIO(ptr_bytes), typ='series').to_dict()
-    except Exception:
+    except Exception as e:
         # fallback to conventional path
         ptr = {"features_blob": f"{settings.features_prefix}/latest/features.parquet"}
+        
+        logger.warning(f"Failed to read _latest.json at {latest_ptr}: {e}")
+        features_blob = f"{settings.features_prefix}/latest/features.parquet"
+        logger.warning(f"Fallback features_blob path: {features_blob}")
+        data = download_bytes(bs, settings.blob_container_name, features_blob)
+        return pd.read_parquet(io.BytesIO(data))
+
+
 
     features_blob = ptr.get("features_blob")
     data = download_bytes(bs, settings.blob_container_name, features_blob)

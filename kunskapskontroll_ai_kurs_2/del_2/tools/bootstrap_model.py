@@ -37,7 +37,7 @@ def main():
     bs = BlobServiceClient(account_url=account_url(args.storage_account), credential=cred)
 
     # Create a tiny baseline dataset (synthetic) so API can start.
-    symbols = ["ERIC-B","VOLV-B","ATCO-A","ATCO-B","SAND","SEB-A","SWED-A","SHB-A","NDA-SE","TELIA"]
+    symbols = ["ERIC-B.ST","VOLV-B.ST","ATCO-A.ST","ATCO-B.ST","SAND.ST","SEB-A.ST","SWED-A.ST","SHB-A.ST","NDA-SE.ST","TELIA.ST"]
     rng = np.random.default_rng(42)
    
     feats = pd.DataFrame({

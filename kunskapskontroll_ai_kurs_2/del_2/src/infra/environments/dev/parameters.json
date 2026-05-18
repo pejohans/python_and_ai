@@ -21,7 +21,7 @@
       "value": "0 0 1 * * *"
     },
     "omx30Symbols": {
-      "value": "ERIC-B,VOLV-B,ATCO-A,ATCO-B,SAND,SEB-A,SWED-A,SHB-A,NDA-SE,TELIA"
+      "value": "ERIC-B.ST,VOLV-B.ST,ATCO-A.ST,ATCO-B.ST,SAND,SEB-A.ST,SWED-A.ST,SHB-A.ST,NDA-SE.ST,TELIA.ST"
     }
   }
 }
