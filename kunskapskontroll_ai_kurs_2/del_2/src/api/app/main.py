@@ -8,22 +8,28 @@ from .settings import settings
 from .model_loader import load_model_bundle
 from .features_loader import get_features_for_symbol
 
-app = FastAPI(title="StockML MVP API", version="0.1.0")
 
-# Configure logging
+# -------- Logging configuration (runs at startup) --------
+
 root_logger = logging.getLogger()
 
+# Update formatter on existing handlers (important for Uvicorn/Azure)
 for handler in root_logger.handlers:
     handler.setFormatter(
         logging.Formatter("%(asctime)s [%(levelname)s] %(name)s: %(message)s")
     )
 
 root_logger.setLevel(logging.INFO)
+
+# Reduce Azure SDK noise
 logging.getLogger("azure").setLevel(logging.WARNING)
 
-#Fetch correct logger
+
+# Module logger
 logger = logging.getLogger(__name__)
 
+
+app = FastAPI(title="StockML MVP API", version="0.1.0")
 
 class PredictResponse(BaseModel):
     symbol: str
@@ -55,13 +61,16 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
     if confidence <= 0.5 or confidence >= 0.99:
         raise HTTPException(status_code=400, detail="confidence must be between 0.50 and 0.99")
 
-    logger.info(f"Starting prediction for symbol: {s}, horizon: {horizon}, confidence: {confidence}")
+    logger.warning(f"Starting prediction for symbol: {s}, horizon: {horizon}, confidence: {confidence}")
 
-    try:        
-        _, mapie = load_model_bundle()        
+    try:
+        logger.warning("Calling load_model_bundle()")
+        _, mapie = load_model_bundle()
+        
+        logger.warning("Calling get_features_for_symbol()")
         X = get_features_for_symbol(s)
         
-        logger.info(f"Features for symbol {s}: {X.shape[0]} samples")
+        logger.warning(f"Features for symbol {s}: {X.shape[0]} samples")
         
         # Extract current price
         current_price = float(X["current_price"].iloc[0])
@@ -74,7 +83,7 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         lower = float(y_pis[0, 0, 0])
         upper = float(y_pis[0, 1, 0])
         
-        logger.info(f"Prediction results for symbol {s}: predicted_return={y_pred[0]}, lower_return={lower}, upper_return={upper}")
+        logger.warning(f"Prediction results for symbol {s}: predicted_return={y_pred[0]}, lower_return={lower}, upper_return={upper}")
 
         return PredictResponse(
             symbol=s,
