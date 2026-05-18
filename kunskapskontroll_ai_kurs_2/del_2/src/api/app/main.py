@@ -21,6 +21,9 @@ for handler in root_logger.handlers:
 root_logger.setLevel(logging.INFO)
 logging.getLogger("azure").setLevel(logging.WARNING)
 
+#Fetch correct logger
+logger = logging.getLogger(__name__)
+
 
 class PredictResponse(BaseModel):
     symbol: str
@@ -52,9 +55,13 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
     if confidence <= 0.5 or confidence >= 0.99:
         raise HTTPException(status_code=400, detail="confidence must be between 0.50 and 0.99")
 
-    try:
-        _, mapie = load_model_bundle()
+    logger.info(f"Starting prediction for symbol: {s}, horizon: {horizon}, confidence: {confidence}")
+
+    try:        
+        _, mapie = load_model_bundle()        
         X = get_features_for_symbol(s)
+        
+        logger.info(f"Features for symbol {s}: {X.shape[0]} samples")
         
         # Extract current price
         current_price = float(X["current_price"].iloc[0])
@@ -66,6 +73,8 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         # Expect y_pis: (n_samples, 2, n_alpha)
         lower = float(y_pis[0, 0, 0])
         upper = float(y_pis[0, 1, 0])
+        
+        logger.info(f"Prediction results for symbol {s}: predicted_return={y_pred[0]}, lower_return={lower}, upper_return={upper}")
 
         return PredictResponse(
             symbol=s,
@@ -79,4 +88,6 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
             current_price=current_price
         )
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Error occurred while making prediction for symbol {s}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))    
+    
