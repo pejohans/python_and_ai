@@ -75,6 +75,12 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         
         logger.warning("Finished load_model_bundle()")
         
+        logger.warning("Calling get_features_for_symbol()")
+        X = get_features_for_symbol(s)
+        
+        X_str = ", ".join(X.columns)
+        logger.warning(f"Loaded features for symbol {s}. Columns: {X_str}")
+        
         
         return PredictResponse(
             symbol=s,
