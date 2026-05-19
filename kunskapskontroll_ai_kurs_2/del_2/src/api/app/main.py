@@ -67,8 +67,6 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
     logger.warning(f"Starting prediction for symbol: {s}, horizon: {horizon}, confidence: {confidence}")
 
     try:
-        
-        #Dummy code to test API endpoint and slowly get it to work
         logger.warning("Calling load_model_bundle()")
         
         _, mapie, feature_cols = load_model_bundle()
@@ -120,52 +118,7 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
             model_version=None,
             generated_at=datetime.now(timezone.utc).isoformat(),
             recent_price=recent_price
-        )      
-        
-        #End Dummy
-        
-        """
-        logger.warning("Calling load_model_bundle()")
-        _, mapie, feature_cols = load_model_bundle()
-        
-        logger.warning("Calling get_features_for_symbol()")
-        X = get_features_for_symbol(s)
-        
-        logger.warning(f"Features for symbol {s}: {X.shape[0]} samples")
-        
-        # Extract recent price
-        recent_price = float(X["recent_price"].iloc[0])
-        
-        #alpha = 1.0 - confidence
-        X_model = X[feature_cols].values # Ensure correct feature order and convert to numpy array
-        #y_pred, y_pis = mapie.predict(X_model) # Prediction with our stored features.
-                
-        # prediction
-        y_pred = mapie.predict(X_model)
-
-        # interval
-        y_pis = mapie.predict_interval(X_model)
-        
-        # MAPIE returns prediction intervals; shape differs by version. Handle common shape.
-        # Expect y_pis: (n_samples, 2, n_alpha)
-        lower = float(y_pis[0, 0, 0])
-        upper = float(y_pis[0, 1, 0])
-        
-        logger.warning(f"Prediction results for symbol {s}: predicted_return={y_pred[0]}, lower_return={lower}, upper_return={upper}")
-
-        return PredictResponse(
-            symbol=s,
-            horizon_days=horizon,
-            predicted_return=float(y_pred[0]),
-            lower_return=lower,
-            upper_return=upper,
-            confidence=confidence,
-            model_version=None,
-            generated_at=datetime.now(timezone.utc).isoformat(),
-            recent_price=recent_price
         )
-        """        
-        #The above code is the intended implementation, but due to some issues with loading the model and features in the Azure Function environment, we will return a dummy response for now. The dummy response allows us to test the API endpoint and integration while we work on resolving the model loading issues.
     except Exception as e:
         logger.error(f"Error occurred while making prediction for symbol {s}: {e}")
         raise HTTPException(status_code=500, detail=str(e))    
