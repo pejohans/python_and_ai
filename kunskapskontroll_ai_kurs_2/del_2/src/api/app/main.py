@@ -87,11 +87,12 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         X_model = X[feature_cols].values
         
         # prediction
-        y_pred = mapie.predict(X_model)
-        logger.warning(f"Model prediction for symbol {s}: {y_pred[0]}")
+        #y_pred = mapie.predict(X_model)
+        #logger.warning(f"Model prediction for symbol {s}: {y_pred[0]}")
 
         # interval
-        y_pis = mapie.predict_interval(X_model)
+        y_pred, y_pis = mapie.predict_interval(X_model)
+        logger.warning(f"Model prediction for symbol {s}: {y_pred[0]}")
         logger.warning(f"Model prediction interval for symbol {s}: {y_pis}")
         logger.warning(f"Model prediction interval shape for symbol {s}: {y_pis.shape}")
         
