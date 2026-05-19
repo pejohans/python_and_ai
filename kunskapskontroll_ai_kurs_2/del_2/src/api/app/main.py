@@ -81,6 +81,9 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         X_str = ", ".join(X.columns)
         logger.warning(f"Loaded features for symbol {s}. Columns: {X_str}")
         
+        # Extract recent price
+        recent_price = float(X["recent_price"].iloc[0])
+        
         
         return PredictResponse(
             symbol=s,
@@ -91,7 +94,7 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
             confidence=confidence,
             model_version=None,
             generated_at=datetime.now(timezone.utc).isoformat(),
-            recent_price=4
+            recent_price=recent_price
         )
         
         
