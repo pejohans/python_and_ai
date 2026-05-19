@@ -91,10 +91,13 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         logger.warning(f"Model prediction for symbol {s}: {y_pred[0]}")
 
         # interval
-        #y_pis = mapie.predict_interval(X_model)
+        y_pis = mapie.predict_interval(X_model)
+        logger.warning(f"Model prediction interval for symbol {s}: {y_pis}")
+        logger.warning(f"Model prediction interval shape for symbol {s}: {y_pis.shape}")
         
-        #lower = float(y_pis[0, 0, 0])
-        #upper = float(y_pis[0, 1, 0])
+        lower = float(y_pis[0, 0, 0])
+        upper = float(y_pis[0, 1, 0])
+        logger.warning(f"Prediction interval for symbol {s}: lower={lower}, upper={upper}")
         
         
         return PredictResponse(
