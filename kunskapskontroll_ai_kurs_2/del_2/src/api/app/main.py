@@ -70,6 +70,9 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         
         _, mapie, feature_cols = load_model_bundle()
         
+        feature_cols_str = ", ".join(feature_cols)
+        logger.warning(f"Loaded model bundle. Feature columns: {feature_cols_str}")
+        
         logger.warning("Finished load_model_bundle()")
         
         
