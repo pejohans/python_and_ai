@@ -84,6 +84,18 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         # Extract recent price
         recent_price = float(X["recent_price"].iloc[0])
         
+        X_model = X[feature_cols].values
+        
+        # prediction
+        y_pred = mapie.predict(X_model)
+        logger.warning(f"Model prediction for symbol {s}: {y_pred[0]}")
+
+        # interval
+        #y_pis = mapie.predict_interval(X_model)
+        
+        #lower = float(y_pis[0, 0, 0])
+        #upper = float(y_pis[0, 1, 0])
+        
         
         return PredictResponse(
             symbol=s,
