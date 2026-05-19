@@ -37,6 +37,9 @@ class PredictResponse(BaseModel):
     predicted_return: float
     lower_return: float
     upper_return: float
+    predicted_price: float
+    lower_price: float
+    upper_price: float
     confidence: float
     model_version: str | None = None
     generated_at: str
@@ -86,33 +89,38 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
         
         X_model = X[feature_cols].values
         
-        # prediction
-        #y_pred = mapie.predict(X_model)
-        #logger.warning(f"Model prediction for symbol {s}: {y_pred[0]}")
-
-        # interval
+        # interval & prediction
         y_pred, y_pis = mapie.predict_interval(X_model)
         logger.warning(f"Model prediction for symbol {s}: {y_pred[0]}")
         logger.warning(f"Model prediction interval for symbol {s}: {y_pis}")
         logger.warning(f"Model prediction interval shape for symbol {s}: {y_pis.shape}")
         
-        lower = float(y_pis[0, 0, 0])
-        upper = float(y_pis[0, 1, 0])
-        logger.warning(f"Prediction interval for symbol {s}: lower={lower}, upper={upper}")
-        
+        pred_return = float(y_pred[0])
+        lower_return = float(y_pis[0, 0, 0])
+        upper_return = float(y_pis[0, 1, 0])
+        logger.warning(f"Prediction interval for symbol {s}: lower={lower_return}, upper={upper_return}")
+                
+        predicted_price = recent_price * (1 + pred_return)
+        lower_price = recent_price * (1 + lower_return)
+        upper_price = recent_price * (1 + upper_return)
+        logger.warning(f"Predicted price for symbol {s}: {predicted_price}")
+        logger.warning(f"Predicted price interval for symbol {s}: lower={lower_price}, upper={upper_price}")
+
         
         return PredictResponse(
             symbol=s,
             horizon_days=horizon,
-            predicted_return=8.5,
-            lower_return=0,
-            upper_return=10,
+            predicted_return=pred_return,
+            lower_return=lower_return,
+            upper_return=upper_return,            
+            predicted_price=predicted_price,
+            lower_price=lower_price,
+            upper_price=upper_price,
             confidence=confidence,
             model_version=None,
             generated_at=datetime.now(timezone.utc).isoformat(),
             recent_price=recent_price
-        )
-        
+        )      
         
         #End Dummy
         
