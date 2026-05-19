@@ -64,6 +64,31 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
     logger.warning(f"Starting prediction for symbol: {s}, horizon: {horizon}, confidence: {confidence}")
 
     try:
+        
+        #Dummy code to test API endpoint and slowly get it to work
+        logger.warning("Calling load_model_bundle()")
+        
+        _, mapie, feature_cols = load_model_bundle()
+        
+        logger.warning("Finished load_model_bundle()")
+        
+        
+        return PredictResponse(
+            symbol=s,
+            horizon_days=horizon,
+            predicted_return=8.5,
+            lower_return=0,
+            upper_return=10,
+            confidence=confidence,
+            model_version=None,
+            generated_at=datetime.now(timezone.utc).isoformat(),
+            recent_price=4
+        )
+        
+        
+        #End Dummy
+        
+        """
         logger.warning("Calling load_model_bundle()")
         _, mapie, feature_cols = load_model_bundle()
         
@@ -103,6 +128,8 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
             generated_at=datetime.now(timezone.utc).isoformat(),
             recent_price=recent_price
         )
+        """        
+        #The above code is the intended implementation, but due to some issues with loading the model and features in the Azure Function environment, we will return a dummy response for now. The dummy response allows us to test the API endpoint and integration while we work on resolving the model loading issues.
     except Exception as e:
         logger.error(f"Error occurred while making prediction for symbol {s}: {e}")
         raise HTTPException(status_code=500, detail=str(e))    
