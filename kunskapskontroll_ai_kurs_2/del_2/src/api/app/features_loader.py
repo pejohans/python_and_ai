@@ -6,6 +6,8 @@ from functools import lru_cache
 from .settings import settings
 from .blob_store import get_blob_service, download_bytes
 
+logger = logging.getLogger(__name__)
+
 
 @lru_cache(maxsize=8)
 def load_latest_features_df():
@@ -14,24 +16,38 @@ def load_latest_features_df():
     if not settings.storage_account_name:
         raise RuntimeError("STORAGE_ACCOUNT_NAME is not set")
     
-    logging.info("Loading latest features...")
-    logging.info(f"Using storage account: {settings.storage_account_name}")
-    logging.info(f"Using blob container: {settings.blob_container_name}")
-    logging.info(f"Using features prefix: {settings.features_prefix}")
+    logger.warning("Loading latest features...")
+    logger.warning(f"Using storage account: {settings.storage_account_name}")
+    logger.warning(f"Using blob container: {settings.blob_container_name}")
+    logger.warning(f"Using features prefix: {settings.features_prefix}")
 
     bs = get_blob_service(settings.storage_account_name)
+    
+    #Only for debugging
+    #container = bs.get_container_client(settings.blob_container_name)
+    #prefix = settings.features_prefix.rstrip("/") + "/"
+    #logger.warning(f"Listing blobs under prefix: {prefix}")
+    #for b in container.list_blobs(name_starts_with=prefix):
+    #    logger.warning(f"FOUND FEATURE BLOB: {b.name}")
+    #End of debugging
+   
     latest_ptr = f"{settings.features_prefix}/_latest.json"
     ptr = None
     try:
         ptr_bytes = download_bytes(bs, settings.blob_container_name, latest_ptr)
         ptr = pd.read_json(io.BytesIO(ptr_bytes), typ='series').to_dict()
-    except Exception:
+        
+        features_blob = ptr.get("features_blob")
+        data = download_bytes(bs, settings.blob_container_name, features_blob)
+        return pd.read_parquet(io.BytesIO(data))
+    except Exception as e:
         # fallback to conventional path
-        ptr = {"features_blob": f"{settings.features_prefix}/latest/features.parquet"}
-
-    features_blob = ptr.get("features_blob")
-    data = download_bytes(bs, settings.blob_container_name, features_blob)
-    return pd.read_parquet(io.BytesIO(data))
+        #ptr = {"features_blob": f"{settings.features_prefix}/latest/features.parquet"}
+        logger.warning(f"Failed to read _latest.json at {latest_ptr}: {e}")
+        features_blob = f"{settings.features_prefix}/latest/features.parquet"
+        logger.warning(f"Fallback features_blob path: {features_blob}")
+        data = download_bytes(bs, settings.blob_container_name, features_blob)
+        return pd.read_parquet(io.BytesIO(data))
 
 
 def get_features_for_symbol(symbol: str) -> pd.DataFrame:

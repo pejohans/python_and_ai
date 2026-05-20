@@ -11,7 +11,7 @@ def fetch_price_data(symbols, lookback_days=40) -> pd.DataFrame:
     for symbol in symbols:
         success = False
         
-        for attempt in range(3):  # ✅ retry loop
+        for attempt in range(3):  # retry loop
             try:
                 df = yf.download(
                     symbol,
@@ -25,7 +25,7 @@ def fetch_price_data(symbols, lookback_days=40) -> pd.DataFrame:
                     success = True
                     df = df[["Close"]].rename(columns={"Close": symbol})
                     all_data.append(df)
-                    break  # ✅ success → exit retry loop
+                    break  # success → exit retry loop
                 
                 if df is None or df.empty:
                     logging.warning(f"{symbol}: empty response (attempt {attempt+1}) - DF={df}")
@@ -53,9 +53,9 @@ def fetch_price_data(symbols, lookback_days=40) -> pd.DataFrame:
 
     if not all_data:
         logging.error("No symbols fetched — skipping run")
-        return pd.DataFrame()   # ✅ do NOT crash
+        return pd.DataFrame()   #Do NOT crash
 
-    # ✅ merge data
+    # Merge data
     result = pd.concat(all_data, axis=1)
 
     logging.info(f"Fetched data for {len(result.columns)} symbols")
