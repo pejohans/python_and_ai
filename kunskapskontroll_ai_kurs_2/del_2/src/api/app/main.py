@@ -44,6 +44,7 @@ class PredictResponse(BaseModel):
     model_version: str | None = None
     generated_at: str
     recent_price: float
+    currency: str
 
 
 @app.get('/health')
@@ -117,7 +118,8 @@ def predict(symbol: str, horizon: int = 7, confidence: float = 0.90):
             confidence=confidence,
             model_version=None,
             generated_at=datetime.now(timezone.utc).isoformat(),
-            recent_price=recent_price
+            recent_price=recent_price,
+            currency="SEK" #TODO: Get real currency from features or settings(ie. currency_market_map.json)
         )
     except Exception as e:
         logger.error(f"Error occurred while making prediction for symbol {s}: {e}")
